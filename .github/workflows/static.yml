@@ -27,13 +27,6 @@
             z-index: -1;
         }
 
-        /* Анимация Ока Саурона */
-        @keyframes eyePulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
-        }
-
         header {
             background: linear-gradient(45deg, 
                 #450000 0%, 
@@ -141,12 +134,82 @@
             50% { opacity: 1; }
             100% { opacity: 0.3; }
         }
+
+        .eye-of-sauron {
+            position: fixed;
+            right: 5%;
+            top: 15%;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, 
+                var(--fire) 0%, 
+                var(--blood-red) 30%, 
+                transparent 60%);
+            border-radius: 50%;
+            filter: blur(10px);
+            animation: eyePulse 5s infinite;
+            z-index: 999;
+        }
+
+        .eye-beam {
+            position: fixed;
+            right: 5%;
+            top: 15%;
+            width: 100vw;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent 10%, 
+                var(--fire) 50%, 
+                transparent 90%);
+            transform-origin: right center;
+            transform: rotate(-15deg);
+            filter: blur(1px);
+            opacity: 0;
+            animation: eyeBeam 8s infinite;
+        }
+
+        @keyframes eyePulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+
+        @keyframes eyeBeam {
+            0% { opacity: 0; transform: rotate(-15deg) scaleX(0); }
+            25% { opacity: 0.8; transform: rotate(-15deg) scaleX(1); }
+            50% { opacity: 0; transform: rotate(-15deg) scaleX(0); }
+            100% { opacity: 0; }
+        }
+
+        .flash {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, 
+                rgba(255,69,0,0.2) 0%, 
+                transparent 70%);
+            opacity: 0;
+            pointer-events: none;
+            animation: randomFlash 15s infinite;
+        }
+
+        @keyframes randomFlash {
+            0% { opacity: 0; }
+            10% { opacity: 0.3; transform: scale(1.2); }
+            11% { opacity: 0; }
+            85% { opacity: 0; }
+            90% { opacity: 0.4; transform: scale(0.8); }
+            100% { opacity: 0; }
+        }
     </style>
 </head>
 <body>
     <div id="particles-js"></div>
     <div class="ring-of-power"></div>
-    
+    <div class="eye-of-sauron"></div>
+    <div class="eye-beam"></div>
+    <div class="flash"></div>
+
     <header>
         <div class="floating-text">◈ Смерть предателям ◈ Хаос ◈ Вечность пламени ◈</div>
         <h1>ЧЁРНАЯ ЛАБОРАТОРНАЯ</h1>
@@ -162,7 +225,6 @@
     <div class="doomsday-clock">🕯️ 07.03.2025 🕯️</div>
 
     <script>
-        // Частицы ада
         particlesJS('particles-js', {
             particles: {
                 number: { value: 150 },
@@ -178,7 +240,6 @@
             }
         });
 
-        // Анимация пепла
         function createAsh() {
             const ash = document.createElement('div');
             ash.style = `
@@ -206,13 +267,39 @@
 
         setInterval(createAsh, 100);
 
-        // Параллакс колец
         window.addEventListener('mousemove', (e) => {
             const ring = document.querySelector('.ring-of-power');
             const x = (window.innerWidth - e.pageX * 2) / 90;
             const y = (window.innerHeight - e.pageY * 2) / 90;
             ring.style.transform = `translate(${x}px, ${y}px)`;
+
+            const angle = Math.atan2(
+                e.clientY - window.innerHeight * 0.15,
+                e.clientX - window.innerWidth * 0.95
+            ) * 180 / Math.PI;
+            
+            document.querySelector('.eye-beam').style.transform = `rotate(${angle - 90}deg)`;
         });
+
+        setInterval(() => {
+            const eye = document.querySelector('.eye-of-sauron');
+            eye.style.filter = `blur(${Math.random() * 5 + 5}px) 
+                brightness(${Math.random() * 0.5 + 0.8})`;
+        }, 3000);
+
+        function createRandomFlash() {
+            const flash = document.createElement('div');
+            flash.className = 'flash';
+            flash.style.animation = `randomFlash ${Math.random() * 5 + 5}s infinite`;
+            document.body.appendChild(flash);
+            
+            setTimeout(() => {
+                flash.style.animation = 'none';
+                flash.remove();
+            }, 10000);
+        }
+
+        setInterval(createRandomFlash, 8000);
     </script>
 </body>
 </html>
